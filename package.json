@@ -2,7 +2,7 @@
   "name": "icastdownloader",
   "version": "0.0.1",
   "description": "Download iCast hebrew audiobooks",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,5 +22,9 @@
   "bugs": {
     "url": "https://github.com/20lives/iCastDownloader/issues"
   },
-  "homepage": "https://github.com/20lives/iCastDownloader#readme"
+  "homepage": "https://github.com/20lives/iCastDownloader#readme",
+  "dependencies": {
+    "node-fetch": "^2.6.0",
+    "xml2js": "^0.4.23"
+  }
 }
