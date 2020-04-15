@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import xml2js from 'xml2js';
 import inquirer from 'inquirer';
+import fs from 'fs';
 
 const baseUrl = 'http://mobile.icast.co.il/';
 
@@ -111,6 +112,21 @@ async function getChapterAudioFilePath(ChapterID, UserID, Token) {
   return res[0].FileName + extra;
 }
 
+async function saveChapter(filePath, bookData, chapterID, chapterName) {
+  const { Name, WriterName } = bookData;
+
+  const dir = `./${Name} - ${WriterName}`;
+
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+
+  const destPath = `${dir}/ ${chapterID + 1}. ${chapterName}.mp3`;
+
+  const data = await fetch(filePath);
+  await data.body.pipe(fs.createWriteStream(destPath));
+}
+
 const loginPrompt = [
   {
     type: 'input',
@@ -148,8 +164,6 @@ const selectBookPrompt = (list) => [
   const loginRes = await login(email, password);
   const { UserID, isSubscription, Token, Success } = loginRes;
 
-  console.log(UserID, Token);
-
   if (Success != '1') {
     console.log(`Login failed: ${loginRes.Description}`);
     return;
@@ -174,16 +188,10 @@ const selectBookPrompt = (list) => [
   }
 
   const list = searchBookRes.map((book) => {
-    const {
-      Name,
-      WriterName,
-      WholeBookDuration,
-      PublishYear,
-      ProductID,
-    } = book;
+    const { Name, WriterName, WholeBookDuration, PublishYear } = book;
     return {
       name: `Title: ${Name}; Author: ${WriterName}; Year: ${PublishYear}; Duration: ${WholeBookDuration}`,
-      value: ProductID,
+      value: book,
     };
   });
 
@@ -191,12 +199,13 @@ const selectBookPrompt = (list) => [
 
   const { BookID } = selectBookPromptRes;
 
-  const chaptersRes = await listChapters(BookID, UserID, Token);
+  const chaptersRes = await listChapters(BookID.ProductID, UserID, Token);
 
-  console.log(chaptersRes);
+  const chaptersCount = chaptersRes.length;
 
-  for (const { ChapterID, ChapterName } of chaptersRes) {
+  for (const [i, { ChapterID, ChapterName }] of chaptersRes.entries()) {
     const filePath = await getChapterAudioFilePath(ChapterID, UserID, Token);
-    console.log(ChapterName, filePath);
+    console.log(`Downloading (${i + 1}/${chaptersCount}): ${ChapterName}`);
+    saveChapter(filePath, BookID, i, ChapterName);
   }
 })();
