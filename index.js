@@ -90,6 +90,15 @@ const searchBookPrompt = [
   },
 ];
 
+const selectBookPrompt = (list) => [
+  {
+    type: 'list',
+    name: 'BookID',
+    message: 'Select a book form search results:',
+    choices: list,
+  },
+];
+
 (async function Run() {
   const loginPromptRes = await inquirer.prompt(loginPrompt);
   const { email, password } = loginPromptRes;
@@ -120,5 +129,23 @@ const searchBookPrompt = [
       console.log('No results found, try again.');
     }
   }
-  console.log(searchBookRes);
+
+  const list = searchBookRes.map((book) => {
+    const {
+      Name,
+      WriterName,
+      WholeBookDuration,
+      PublishYear,
+      ProductID,
+    } = book;
+    return {
+      name: `Title: ${Name}; Author: ${WriterName}; Year: ${PublishYear}; Duration: ${WholeBookDuration}`,
+      value: ProductID,
+    };
+  });
+
+  const selectBookPromptRes = await inquirer.prompt(selectBookPrompt(list));
+
+  const { BookID } = selectBookPromptRes;
+  console.log(BookID);
 })();
