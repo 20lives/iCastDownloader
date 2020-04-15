@@ -5,7 +5,7 @@ const baseUrl = 'http://mobile.icast.co.il/';
 
 function createParamsString(obj) {
   const params = new URLSearchParams();
-  for(const key in obj) {
+  for (const key in obj) {
     params.append(key, obj[key]);
   }
   return params;
@@ -14,10 +14,10 @@ function createParamsString(obj) {
 function parseXmlObject(obj) {
   const arr = obj.plist.array[0].dict;
 
-  return arr.map(item => {
-    const {key, string} = item;
+  return arr.map((item) => {
+    const { key, string } = item;
     const res = {};
-    for (let i = 0; i < key.length ; i++) {
+    for (let i = 0; i < key.length; i++) {
       res[key[i]] = string[i];
     }
     return res;
@@ -25,7 +25,6 @@ function parseXmlObject(obj) {
 }
 
 async function sendRequest(page, params) {
-
   const options = {
     method: 'POST',
     body: createParamsString(params),
