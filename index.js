@@ -194,4 +194,9 @@ const selectBookPrompt = (list) => [
   const chaptersRes = await listChapters(BookID, UserID, Token);
 
   console.log(chaptersRes);
+
+  for (const { ChapterID, ChapterName } of chaptersRes) {
+    const filePath = await getChapterAudioFilePath(ChapterID, UserID, Token);
+    console.log(ChapterName, filePath);
+  }
 })();
