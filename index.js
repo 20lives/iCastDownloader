@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import fetch from 'node-fetch';
 import xml2js from 'xml2js';
 import inquirer from 'inquirer';
