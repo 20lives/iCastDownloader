@@ -38,14 +38,23 @@ async function sendRequest(page, params) {
   return obj;
 }
 
-const params = {
-  DeviceType: 1,
-  Email: '',
-  ApplicationVersion: '1.6.1.34.1',
-  Pass: '',
-};
+async function login(email, password) {
+  const requestPath = 'BookUserLogin.aspx';
+
+  const params = {
+    Email: email,
+    Pass: password,
+    UUID: 'unknown',
+  };
+
+  const res = await sendRequest(requestPath, params);
+
+  return res[0];
+}
 
 (async function Run() {
-  const a = await sendRequest('BookUserLogin.aspx', params);
-  console.log(a);
+  const email = '';
+  const password = '';
+  const res = login(email, password);
+  console.log(res);
 })();
