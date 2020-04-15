@@ -53,6 +53,21 @@ async function login(email, password) {
   return res[0];
 }
 
+async function search(query) {
+  const requestPath = 'BookSearch.aspx';
+
+  const params = {
+    DeviceType: 4,
+    SortDir: 0,
+    PageNum: 0,
+    UserID: 1,
+    SortCode: 1,
+    SearchText: query,
+  };
+
+  return await sendRequest(requestPath, params);
+}
+
 const loginPrompt = [
   {
     type: 'input',
