@@ -94,6 +94,23 @@ async function listChapters(BookID, UserID, Token) {
   return chapters;
 }
 
+async function getChapterAudioFilePath(ChapterID, UserID, Token) {
+  const requestPath = 'BookGetChapterInfo.aspx';
+
+  const params = {
+    DeviceType: 4,
+    UID: UserID,
+    UserID: UserID,
+    ChapterID,
+    DEVICEUUID: 'unknown',
+    Token,
+  };
+
+  const extra = `&uid=${UserID}&deviceuuid=unknown&token=${Token}`;
+  const res = await sendRequest(requestPath, params);
+  return res[0].FileName + extra;
+}
+
 const loginPrompt = [
   {
     type: 'input',
