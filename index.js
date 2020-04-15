@@ -82,11 +82,21 @@ const loginPrompt = [
   },
 ];
 
+const searchBookPrompt = [
+  {
+    type: 'input',
+    name: 'query',
+    message: 'Search for an audiobook by a keyword:',
+  },
+];
+
 (async function Run() {
   const loginPromptRes = await inquirer.prompt(loginPrompt);
   const { email, password } = loginPromptRes;
   const loginRes = await login(email, password);
   const { UserID, isSubscription, Token, Success } = loginRes;
+
+  console.log(UserID, Token);
 
   if (Success != '1') {
     console.log(`Login failed: ${loginRes.Description}`);
@@ -96,5 +106,19 @@ const loginPrompt = [
     console.log('User has no active subscription.');
     return;
   }
-  console.log(UserID, Token);
+
+  let searchBookRes = [];
+  while (searchBookRes.length < 1) {
+    const searchBookPromptRes = await inquirer.prompt(searchBookPrompt);
+    const { query } = searchBookPromptRes;
+    searchBookRes = await search(query);
+
+    searchBookRes.shift();
+    searchBookRes.pop();
+
+    if (searchBookRes.length < 1) {
+      console.log('No results found, try again.');
+    }
+  }
+  console.log(searchBookRes);
 })();
