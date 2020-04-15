@@ -12,12 +12,16 @@ function createParamsString(obj) {
 }
 
 function parseXmlObject(obj) {
-  const {key, string} = obj.plist.array[0].dict[0];
-  const res = {};
-  for (let i = 0; i < key.length ; i++) {
-    res[key[i]] = string[i];
-  }
-  return res;
+  const arr = obj.plist.array[0].dict;
+
+  return arr.map(item => {
+    const {key, string} = item;
+    const res = {};
+    for (let i = 0; i < key.length ; i++) {
+      res[key[i]] = string[i];
+    }
+    return res;
+  });
 }
 
 async function sendRequest(page, params) {
