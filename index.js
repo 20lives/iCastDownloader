@@ -70,6 +70,16 @@ const loginPrompt = [
 (async function Run() {
   const loginPromptRes = await inquirer.prompt(loginPrompt);
   const { email, password } = loginPromptRes;
-  const res = await login(email, password);
-  console.log(res);
+  const loginRes = await login(email, password);
+  const { UserID, isSubscription, Token, Success } = loginRes;
+
+  if (Success != '1') {
+    console.log(`Login failed: ${loginRes.Description}`);
+    return;
+  }
+  if (isSubscription != '1') {
+    console.log('User has no active subscription.');
+    return;
+  }
+  console.log(UserID, Token);
 })();
