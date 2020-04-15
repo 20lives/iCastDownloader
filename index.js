@@ -53,9 +53,23 @@ async function login(email, password) {
   return res[0];
 }
 
+const loginPrompt = [
+  {
+    type: 'input',
+    name: 'email',
+    message: 'Email address:',
+  },
+  {
+    type: 'password',
+    name: 'password',
+    mask: '*',
+    message: 'Password:',
+  },
+];
+
 (async function Run() {
-  const email = '';
-  const password = '';
-  const res = login(email, password);
+  const loginPromptRes = await inquirer.prompt(loginPrompt);
+  const { email, password } = loginPromptRes;
+  const res = await login(email, password);
   console.log(res);
 })();
