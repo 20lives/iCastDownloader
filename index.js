@@ -68,6 +68,32 @@ async function search(query) {
   return await sendRequest(requestPath, params);
 }
 
+async function listChapters(BookID, UserID, Token) {
+  const requestPath = 'BookGetChapters.aspx';
+  let chapters = [];
+
+  const params = {
+    DeviceType: 4,
+    UID: UserID,
+    BookID,
+    PageNum: 0,
+    UserID,
+    DEVICEUUID: 'unknown',
+    Token,
+  };
+
+  let next = 1;
+
+  while (next == 1) {
+    const pageChapters = await sendRequest(requestPath, params);
+    next = pageChapters.shift().isNextPage;
+    pageChapters.pop();
+    params.PageNum++;
+    chapters = [...chapters, ...pageChapters];
+  }
+  return chapters;
+}
+
 const loginPrompt = [
   {
     type: 'input',
@@ -147,5 +173,8 @@ const selectBookPrompt = (list) => [
   const selectBookPromptRes = await inquirer.prompt(selectBookPrompt(list));
 
   const { BookID } = selectBookPromptRes;
-  console.log(BookID);
+
+  const chaptersRes = await listChapters(BookID, UserID, Token);
+
+  console.log(chaptersRes);
 })();
