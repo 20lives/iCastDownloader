@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import xml2js from 'xml2js';
+import inquirer from 'inquirer';
 
 const baseUrl = 'http://mobile.icast.co.il/';
 
