@@ -7,14 +7,6 @@ import fs from 'fs';
 
 const baseUrl = 'http://mobile.icast.co.il/';
 
-function createParamsString(obj) {
-  const params = new URLSearchParams();
-  for (const key in obj) {
-    params.append(key, obj[key]);
-  }
-  return params;
-}
-
 function parseXmlObject(obj) {
   const arr = obj.plist.array[0].dict;
 
@@ -31,7 +23,7 @@ function parseXmlObject(obj) {
 async function sendRequest(page, params) {
   const options = {
     method: 'POST',
-    body: createParamsString(params),
+    body: new URLSearchParams(params),
   };
 
   const url = `${baseUrl}${page}`;
