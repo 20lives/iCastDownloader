@@ -96,20 +96,16 @@ async function listChapters(bookID, page = 0) {
     : stripped;
 }
 
-async function getChapterAudioFilePath(ChapterID) {
-  const requestPath = 'BookGetChapterInfo.aspx';
-
+function getChapterAudioFilePath(chapterID) {
   const params = {
     DeviceType: 4,
     UID: userID,
     UserID: userID,
-    ChapterID,
+    ChapterID: chapterID,
     DEVICEUUID: constants.uuid,
-    Token: token
-    ,
+    Token: token,
   };
 
-  const extra = `&uid=${userID}&deviceuuid=unknown&token=${token}`;
-  const res = await sendRequest(requestPath, params);
-  return res[0].FileName + extra;
+  const extra = `&uid=${userID}&deviceuuid=${constants.uuid}&token=${token}`;
+  return sendRequest('chapterInfo', params).then((x) => x[0].FileName + extra);
 }
