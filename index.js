@@ -56,14 +56,10 @@ const selectBookPrompt = (list) => [
   const loginPromptRes = await inquirer.prompt(loginPrompt);
   const { email, password } = loginPromptRes;
   const loginRes = await icast.login(email, password);
-  const { UserID, isSubscription, Token, Success } = loginRes;
+  const { success } = loginRes;
 
-  if (Success != '1') {
-    console.log(`Login failed: ${loginRes.Description}`);
-    return;
-  }
-  if (isSubscription != '1') {
-    console.log('User has no active subscription.');
+  if (!success) {
+    console.log(`Login failed: ${loginRes.details}`);
     return;
   }
 
@@ -93,12 +89,12 @@ const selectBookPrompt = (list) => [
 
   const { BookID } = selectBookPromptRes;
 
-  const chaptersRes = await icast.listChapters(BookID.ProductID, UserID, Token);
+  const chaptersRes = await icast.listChapters(BookID.ProductID);
 
   const chaptersCount = chaptersRes.length;
 
   for (const [i, { ChapterID, ChapterName }] of chaptersRes.entries()) {
-    const filePath = await getChapterAudioFilePath(ChapterID, UserID, Token);
+    const filePath = await icast.getChapterAudioFilePath(ChapterID);
     console.log(`Downloading (${i + 1}/${chaptersCount}): ${ChapterName}`);
     saveChapter(filePath, BookID, i, ChapterName);
   }

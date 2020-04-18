@@ -10,6 +10,9 @@ export default {
   getChapterAudioFilePath,
 }
 
+let token;
+let userID;
+
 function parseXmlObject(obj) {
   const arr = obj.plist.array[0].dict;
   return arr.map(({ key: keys, string: values }) => {
@@ -37,17 +40,26 @@ function sendRequest(urlKey, params) {
 }
 
 async function login(email, password) {
-  const requestPath = 'BookUserLogin.aspx';
-
   const params = {
     Email: email,
     Pass: password,
-    UUID: 'unknown',
+    UUID: constants.uuid,
   };
 
-  const res = await sendRequest(requestPath, params);
+  const res = await sendRequest('login', params).then((x) => x[0]);
 
-  return res[0];
+  if (res.Success != '1') {
+    return { sucess: false, details: res.Description };
+  }
+
+  if (res.isSubscription != '1') {
+    return { sucess: false, details: 'User has no active subscription.' };
+  }
+
+  userID = res.UserID;
+  token = res.Token;
+
+  return { success: true };
 }
 
 async function search(query) {
@@ -65,18 +77,18 @@ async function search(query) {
   return await sendRequest(requestPath, params);
 }
 
-async function listChapters(BookID, UserID, Token) {
+async function listChapters(BookID) {
   const requestPath = 'BookGetChapters.aspx';
   let chapters = [];
 
   const params = {
     DeviceType: 4,
-    UID: UserID,
+    UID: userID,
     BookID,
     PageNum: 0,
-    UserID,
+    UserID: userID,
     DEVICEUUID: 'unknown',
-    Token,
+    Token: token,
   };
 
   let next = 1;
@@ -91,19 +103,20 @@ async function listChapters(BookID, UserID, Token) {
   return chapters;
 }
 
-async function getChapterAudioFilePath(ChapterID, UserID, Token) {
+async function getChapterAudioFilePath(ChapterID) {
   const requestPath = 'BookGetChapterInfo.aspx';
 
   const params = {
     DeviceType: 4,
-    UID: UserID,
-    UserID: UserID,
+    UID: userID,
+    UserID: userID,
     ChapterID,
     DEVICEUUID: 'unknown',
-    Token,
+    Token: token
+    ,
   };
 
-  const extra = `&uid=${UserID}&deviceuuid=unknown&token=${Token}`;
+  const extra = `&uid=${userID}&deviceuuid=unknown&token=${token}`;
   const res = await sendRequest(requestPath, params);
   return res[0].FileName + extra;
 }
