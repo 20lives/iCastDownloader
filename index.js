@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 import inquirer from 'inquirer';
 import fs from 'fs';
 
+import prompts from './prompts.js';
 import icast from './icastApi.js';
 
 async function saveChapter(filePath, bookData, chapterID, chapterName) {
@@ -21,39 +22,8 @@ async function saveChapter(filePath, bookData, chapterID, chapterName) {
   await data.body.pipe(fs.createWriteStream(destPath));
 }
 
-const loginPrompt = [
-  {
-    type: 'input',
-    name: 'email',
-    message: 'Email address:',
-  },
-  {
-    type: 'password',
-    name: 'password',
-    mask: '*',
-    message: 'Password:',
-  },
-];
-
-const searchBookPrompt = [
-  {
-    type: 'input',
-    name: 'query',
-    message: 'Search for an audiobook by a keyword:',
-  },
-];
-
-const selectBookPrompt = (list) => [
-  {
-    type: 'list',
-    name: 'BookID',
-    message: 'Select a book form search results:',
-    choices: list,
-  },
-];
-
 (async function Run() {
-  const loginPromptRes = await inquirer.prompt(loginPrompt);
+  const loginPromptRes = await inquirer.prompt(prompts.login);
   const { email, password } = loginPromptRes;
   const loginRes = await icast.login(email, password);
   const { success } = loginRes;
@@ -65,12 +35,9 @@ const selectBookPrompt = (list) => [
 
   let searchBookRes = [];
   while (searchBookRes.length < 1) {
-    const searchBookPromptRes = await inquirer.prompt(searchBookPrompt);
+    const searchBookPromptRes = await inquirer.prompt(prompts.searchBook);
     const { query } = searchBookPromptRes;
     searchBookRes = await icast.search(query);
-
-    searchBookRes.shift();
-    searchBookRes.pop();
 
     if (searchBookRes.length < 1) {
       console.log('No results found, try again.');
@@ -85,7 +52,7 @@ const selectBookPrompt = (list) => [
     };
   });
 
-  const selectBookPromptRes = await inquirer.prompt(selectBookPrompt(list));
+  const selectBookPromptRes = await inquirer.prompt(prompts.selectBook(list));
 
   const { BookID } = selectBookPromptRes;
 
