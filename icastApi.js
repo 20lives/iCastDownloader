@@ -74,7 +74,7 @@ async function search(query) {
     SearchText: query,
   };
 
-  return await sendRequest(requestPath, params);
+  return sendRequest('search', params).then((x) => x.slice(1, -1));
 }
 
 async function listChapters(bookID, page = 0) {
