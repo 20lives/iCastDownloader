@@ -30,6 +30,7 @@
   "dependencies": {
     "inquirer": "^7.1.0",
     "node-fetch": "^2.6.0",
+    "progress": "^2.0.3",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {

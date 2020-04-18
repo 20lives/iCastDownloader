@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-import fetch from 'node-fetch';
 import inquirer from 'inquirer';
+import fetch from 'node-fetch';
 import fs from 'fs';
+import progress from 'progress';
 
 import prompts from './prompts.js';
 import icast from './icastApi.js';
 
-async function saveChapter(filePath, bookData, chapterID, chapterName) {
+function saveChapter( filePath, bookData, i, total, chapterName) {
   const { Name, WriterName } = bookData;
 
   const dir = `./${Name} - ${WriterName}`;
@@ -16,10 +17,20 @@ async function saveChapter(filePath, bookData, chapterID, chapterName) {
     fs.mkdirSync(dir);
   }
 
-  const destPath = `${dir}/ ${chapterID + 1}. ${chapterName}.mp3`;
+  const destPath = `${dir}/ ${i + 1}. ${chapterName}.mp3`;
 
-  const data = await fetch(filePath);
-  await data.body.pipe(fs.createWriteStream(destPath));
+  return fetch(filePath).then((data) => {
+    const bar = new progress( `[:bar] (${i + 1}/${total}): ${chapterName}`, {
+      complete: '=',
+      incomplete: ' ',
+      width: 30,
+      total: Number(data.headers.get('content-length')),
+    });
+
+    data.body.pipe(fs.createWriteStream(destPath));
+    data.body.on('data', (chunk) => bar.tick(chunk.length));
+    return new Promise((resolve) => data.body.on('end', resolve));
+  });
 }
 
 (async function Run() {
@@ -62,7 +73,6 @@ async function saveChapter(filePath, bookData, chapterID, chapterName) {
 
   for (const [i, { ChapterID, ChapterName }] of chaptersRes.entries()) {
     const filePath = await icast.getChapterAudioFilePath(ChapterID);
-    console.log(`Downloading (${i + 1}/${chaptersCount}): ${ChapterName}`);
-    saveChapter(filePath, BookID, i, ChapterName);
+    await saveChapter(filePath, BookID, i, chaptersCount, ChapterName);
   }
 })();
