@@ -8,7 +8,7 @@ export default {
   search,
   listChapters,
   getChapterAudioFilePath,
-}
+};
 
 let token;
 let userID;
