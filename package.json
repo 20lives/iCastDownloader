@@ -1,6 +1,6 @@
 {
   "name": "icastdownloader",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "description": "Download iCast hebrew audiobooks",
   "type": "module",
   "bin": {
