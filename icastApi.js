@@ -77,30 +77,23 @@ async function search(query) {
   return await sendRequest(requestPath, params);
 }
 
-async function listChapters(BookID) {
-  const requestPath = 'BookGetChapters.aspx';
-  let chapters = [];
-
+async function listChapters(bookID, page = 0) {
   const params = {
     DeviceType: 4,
     UID: userID,
-    BookID,
-    PageNum: 0,
+    BookID: bookID,
+    PageNum: page,
     UserID: userID,
-    DEVICEUUID: 'unknown',
+    DEVICEUUID: constants.uuid,
     Token: token,
   };
 
-  let next = 1;
+  const chapters = await sendRequest('chapters', params);
 
-  while (next == 1) {
-    const pageChapters = await sendRequest(requestPath, params);
-    next = pageChapters.shift().isNextPage;
-    pageChapters.pop();
-    params.PageNum++;
-    chapters = [...chapters, ...pageChapters];
-  }
-  return chapters;
+  const stripped = chapters.slice(1, -1);
+  return chapters[0].isNextPage == '1'
+    ? [...stripped, ...(await listChapters(bookID, page + 1))]
+    : stripped;
 }
 
 async function getChapterAudioFilePath(ChapterID) {
