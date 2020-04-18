@@ -9,14 +9,8 @@ const baseUrl = 'http://mobile.icast.co.il/';
 
 function parseXmlObject(obj) {
   const arr = obj.plist.array[0].dict;
-
-  return arr.map((item) => {
-    const { key, string } = item;
-    const res = {};
-    for (let i = 0; i < key.length; i++) {
-      res[key[i]] = string[i];
-    }
-    return res;
+  return arr.map(({ key: keys, string: values }) => {
+    return keys.reduce((obj, key, i) => ((obj[key] = values[i]), obj), {});
   });
 }
 
