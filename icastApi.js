@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import xml2js from 'xml2js';
 
-const baseUrl = 'http://mobile.icast.co.il/';
+import constants from './constants.js';
 
 export default {
   login,
@@ -104,7 +104,7 @@ async function getChapterAudioFilePath(ChapterID) {
     UID: userID,
     UserID: userID,
     ChapterID,
-    DEVICEUUID: 'unknown',
+    DEVICEUUID: constants.uuid,
     Token: token
     ,
   };
