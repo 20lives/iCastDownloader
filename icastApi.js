@@ -17,18 +17,23 @@ function parseXmlObject(obj) {
   });
 }
 
-async function sendRequest(page, params) {
-  const options = {
+function getUrl(key) {
+  const { baseUrl, urls } = constants;
+  return `${baseUrl}Book${urls[key]}.aspx`;
+}
+
+function getOptions(params) {
+  return {
     method: 'POST',
     body: new URLSearchParams(params),
   };
+}
 
-  const url = `${baseUrl}${page}`;
-  const res = await fetch(url, options);
-  const xmlStr = await res.text();
-  const json = await xml2js.parseStringPromise(xmlStr);
-  const obj = parseXmlObject(json);
-  return obj;
+function sendRequest(urlKey, params) {
+  return fetch(getUrl(urlKey), getOptions(params))
+    .then((res) => res.text())
+    .then(xml2js.parseStringPromise)
+    .then(parseXmlObject);
 }
 
 async function login(email, password) {
