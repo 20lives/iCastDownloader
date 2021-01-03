@@ -8,7 +8,7 @@ import progress from 'progress';
 import prompts from './prompts.js';
 import icast from './icastApi.js';
 
-function saveChapter( filePath, bookData, i, total, chapterName) {
+function saveChapter(filePath, bookData, i, total, chapterName) {
   const { Name, WriterName } = bookData;
 
   const dir = `./${Name} - ${WriterName}`;
@@ -20,7 +20,7 @@ function saveChapter( filePath, bookData, i, total, chapterName) {
   const destPath = `${dir}/ ${i + 1}. ${chapterName}.mp3`;
 
   return fetch(filePath).then((data) => {
-    const bar = new progress( `[:bar] (${i + 1}/${total}): ${chapterName}`, {
+    const bar = new progress(`[:bar] (${i + 1}/${total}): ${chapterName}`, {
       complete: '=',
       incomplete: ' ',
       width: 30,
