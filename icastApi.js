@@ -62,17 +62,22 @@ async function login(email, password) {
   return { success: true };
 }
 
-function search(query) {
+async function search(query, page = 0) {
   const params = {
     DeviceType: 4,
     SortDir: 0,
-    PageNum: 0,
+    PageNum: page,
     UserID: 1,
     SortCode: 1,
     SearchText: query,
   };
 
-  return sendRequest('search', params).then((x) => x.slice(1, -1));
+  const results = await sendRequest('search', params);
+
+  const stripped = results.slice(1, -1);
+  return results[0].isNextPage == '1'
+    ? [...stripped, ...(await search(query, page + 1))]
+    : stripped;
 }
 
 async function listChapters(bookID, page = 0) {
